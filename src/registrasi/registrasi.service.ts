@@ -63,7 +63,7 @@ export class RegistrasiService {
             throw new BadRequestException('File tidak boleh kosong')
         }
 
-        const halfMb = 500 * 1000
+        const halfMb = 1000 * 1000
         const fileType = receipt.mimetype
         const fileSize = receipt.size
         const permittedFiles = [
@@ -73,7 +73,7 @@ export class RegistrasiService {
         ]
 
         if (fileSize > halfMb) {
-            throw new BadRequestException('Ukuran foto receipt harus di bawah 5 MB')
+            throw new BadRequestException('Ukuran foto receipt maksimal 1 MB')
         }
 
         if (!permittedFiles.includes(fileType)) {
