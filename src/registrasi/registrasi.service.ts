@@ -141,7 +141,7 @@ export class RegistrasiService {
             )
         }
 
-        const tipeSekolahRaw: unknown = akun.id
+        const tipeSekolahRaw: unknown = akun.idTipeSekolah
         const getTipeSekolah: TipeSekolah = <TipeSekolah>tipeSekolahRaw
         const id = getTipeSekolah.id
         const tipeSekolah = await this.tipeSekolahRepository.findOneBy({ id })
@@ -153,6 +153,7 @@ export class RegistrasiService {
         }
 
         const idSekolah = tipeSekolah.idSekolah
+        console.log(idSekolah)
         const tipeSekolahArray = await this.tipeSekolahRepository.find({
             where: {
                 idSekolah
