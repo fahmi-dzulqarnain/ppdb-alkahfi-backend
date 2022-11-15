@@ -84,7 +84,7 @@ export class SiswaService {
             )
         }
 
-        const tipeSekolahRaw: unknown = akun.id
+        const tipeSekolahRaw: unknown = akun.idTipeSekolah
         const getTipeSekolah: TipeSekolah = <TipeSekolah>tipeSekolahRaw
         const id = getTipeSekolah.id
         const tipeSekolah = await this.tipeSekolahRepository.findOneBy({ id })
