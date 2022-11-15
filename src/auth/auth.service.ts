@@ -8,6 +8,7 @@ import { AkunRepository } from './akun.repository';
 import { LoginDTO, RegisterDTO } from './model/dto';
 import { TipeSekolahRepository } from 'src/sekolah/tipe-sekolah.repository';
 import * as bcrypt from 'bcrypt'
+import { SekolahRepository } from 'src/sekolah/sekolah.repository';
 
 @Injectable()
 export class AuthService {
@@ -20,22 +21,28 @@ export class AuthService {
         private siswaRepository: SiswaRepository,
         @InjectRepository(WaliSiswaRepository)
         private waliSiswaRepository: WaliSiswaRepository,
+        @InjectRepository(SekolahRepository)
+        private sekolahRepository: SekolahRepository,
         @InjectRepository(TipeSekolahRepository)
         private tipeSekolahRepository: TipeSekolahRepository,
         private jwtService: JwtService
-    ) {}
+    ) { }
 
     async registerAccount(dto: RegisterDTO) {
         const createAccount = await this.akunRepository.createAccount(dto)
         const akun = createAccount.akun
-        const register = await this.registerRepository.createRegistration(akun.noPendaftaran)
+        const idTipeSekolah = akun.idTipeSekolah
+        const tipeSekolah = await this.tipeSekolahRepository.findOneBy({ id: idTipeSekolah })
+        const idSekolah = tipeSekolah.idSekolah
+        const sekolah = await this.sekolahRepository.findOneBy({ idSekolah })
+        const register = await this.registerRepository.createRegistration(akun.noPendaftaran, sekolah.biayaPendaftaran)
         const idRegistrasi = register.idRegistrasi
         const waliSiswa = await this.waliSiswaRepository.createWaliSiswa(dto)
         const idOrangTua = waliSiswa.idOrangTua
         const siswa = await this.siswaRepository.createSiswa(dto, idRegistrasi, idOrangTua)
 
-        if(siswa) {
-            await this.tipeSekolahRepository.substractSisaKuota(akun.idTipeSekolah)
+        if (siswa) {
+            await this.tipeSekolahRepository.substractSisaKuota(idTipeSekolah)
         }
 
         return {
@@ -61,7 +68,7 @@ export class AuthService {
         const username = akun.username
         const payload = { username, tipeAkun }
         const accessToken = await this.jwtService.signAsync(payload)
-        
+
         return {
             statusCode: 200,
             message: "Sukses masuk ke dalam akun",

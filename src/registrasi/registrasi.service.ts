@@ -22,7 +22,7 @@ export class RegistrasiService {
         private tipeSekolahRepository: TipeSekolahRepository,
         @InjectRepository(AkunRepository)
         private akunRepository: AkunRepository
-    ) {}
+    ) { }
 
     async updateStatusByIDs(dto: UpdateStatusDTO, akun: Akun) {
         if (akun.tipeAkun != TipeAkun.adminSekolah) {
@@ -33,7 +33,7 @@ export class RegistrasiService {
 
         const { ids, statusRegistrasi } = dto
 
-        if(ids.length < 1) {
+        if (ids.length < 1) {
             throw new BadRequestException('ID perlu diisi')
         }
 
@@ -76,13 +76,13 @@ export class RegistrasiService {
             throw new BadRequestException('Ukuran foto receipt harus di bawah 5 MB')
         }
 
-        if (!permittedFiles.includes(fileType)){
+        if (!permittedFiles.includes(fileType)) {
             throw new BadRequestException('Jenis foto receipt harus PNG/JPEG/JPG')
         }
 
         const registrasi = await this.registrasiRepository.getByID(id)
 
-        if(registrasi.buktiTransaksi != '-') {
+        if (registrasi.buktiTransaksi != '-') {
             this.deletePicture(registrasi.buktiTransaksi)
         }
 
@@ -98,7 +98,7 @@ export class RegistrasiService {
 
     async getReceipt(idRegistrasi: string, akun: Akun) {
         const isExists = this.akunRepository.findOneBy({ id: akun.id })
-        
+
         if (!isExists) {
             throw new NotFoundException(
                 'Tidak dapat menemukan akun'
@@ -117,7 +117,7 @@ export class RegistrasiService {
 
         const registrasi = await this.registrasiRepository.getByID(id)
 
-        if(registrasi.buktiTransaksi != '-') {
+        if (registrasi.buktiTransaksi != '-') {
             this.deletePicture(registrasi.buktiTransaksi)
         }
 
@@ -142,7 +142,7 @@ export class RegistrasiService {
         }
 
         const tipeSekolahRaw: unknown = akun.id
-        const getTipeSekolah: TipeSekolah = <TipeSekolah>tipeSekolahRaw 
+        const getTipeSekolah: TipeSekolah = <TipeSekolah>tipeSekolahRaw
         const id = getTipeSekolah.id
         const tipeSekolah = await this.tipeSekolahRepository.findOneBy({ id })
 
@@ -161,11 +161,12 @@ export class RegistrasiService {
 
         const noPendaftaranArray: number[] = []
 
-        for(let i = 0; i < tipeSekolahArray.length; i++) {
+        for (let i = 0; i < tipeSekolahArray.length; i++) {
             const idTipeSekolah = tipeSekolahArray[i].id
             const akuns = await this.akunRepository.find({
                 where: {
-                    idTipeSekolah
+                    idTipeSekolah,
+                    tipeAkun: TipeAkun.pendaftar
                 }
             })
 
@@ -173,7 +174,7 @@ export class RegistrasiService {
                 noPendaftaranArray.push(akun.noPendaftaran)
             })
         }
-        
+
         const registrasiArray: Registrasi[] = await this.registrasiRepository.find({
             where: {
                 noPendaftaran: In(noPendaftaranArray)
@@ -211,7 +212,7 @@ export class RegistrasiService {
     }
 
     getCountStatus(registrasiArray: Registrasi[], status: StatusRegistrasi) {
-        return registrasiArray.filter(registrasi => 
+        return registrasiArray.filter(registrasi =>
             registrasi.status == status
         ).length
     }

@@ -1,7 +1,7 @@
-import { IsMobilePhone, IsNotEmpty, Matches } from "class-validator";
+import { IsNotEmpty, IsString, Matches } from "class-validator";
 
 export class LoginDTO {
-    @IsMobilePhone(["id-ID", "en-SG", "ms-MY"])
+    @IsString()
     @IsNotEmpty()
     noHP: string
 

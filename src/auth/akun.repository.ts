@@ -19,7 +19,7 @@ export class AkunRepository extends Repository<Akun> {
         const hashedPassword = await bcrypt.hash(dto.sandi, salt)
 
         const akun = this.create({
-            username: dto.hpAyah,
+            username: dto.username,
             sandi: hashedPassword,
             tipeAkun: dto.tipeAkun || TipeAkun.pendaftar,
             idTipeSekolah: dto.idTipeSekolah
@@ -27,14 +27,14 @@ export class AkunRepository extends Repository<Akun> {
 
         try {
             await this.save(akun)
-            
+
             return {
                 message: "Account Created Successfully",
                 akun
             }
         } catch (error) {
-            if(error.code === '23505') {
-                throw new ConflictException('Username is already exists')
+            if (error.code === '23505') {
+                throw new ConflictException('Akun telah terdaftar, mohon hubungi panitia jika ini adalah kesalahan')
             } else {
                 throw new BadRequestException(error.message)
             }

@@ -1,7 +1,7 @@
-import { 
-    IsEnum, IsMobilePhone, IsNotEmpty, 
-    IsNumber, IsOptional, IsString, 
-    IsUUID, Matches, Max, MaxLength 
+import {
+    IsEnum, IsMobilePhone, IsNotEmpty,
+    IsNumber, IsNumberString, IsOptional, IsString,
+    IsUUID, Matches, Max, MaxLength
 } from "class-validator"
 import { TipeAkun } from "../enum/tipe-akun.enum"
 
@@ -13,7 +13,7 @@ export class RegisterDTO {
 
     @IsString()
     @IsNotEmpty()
-    @MaxLength(32)
+    @MaxLength(48)
     sandi: string
 
     @IsEnum(TipeAkun)
@@ -24,23 +24,23 @@ export class RegisterDTO {
 
     @IsString()
     @IsNotEmpty()
-    @MaxLength(24)
+    @MaxLength(48)
     namaAyah: string
 
     @IsMobilePhone(["id-ID", "en-SG", "ms-MY"])
     hpAyah: string
-  
+
     @IsString()
     @IsNotEmpty()
-    @MaxLength(24)
+    @MaxLength(48)
     namaIbu: string
 
     @IsMobilePhone(["id-ID", "en-SG", "ms-MY"])
     hpIbu: string
-  
+
     @IsString()
     @IsNotEmpty()
-    @MaxLength(32)
+    @MaxLength(64)
     alamat: string
 
     @IsString()
@@ -55,9 +55,9 @@ export class RegisterDTO {
 
     @IsString()
     @IsNotEmpty()
-    @MaxLength(24)
+    @MaxLength(48)
     namaLengkap: string
-   
+
     @IsString()
     @IsNotEmpty()
     @MaxLength(24)
@@ -73,13 +73,15 @@ export class RegisterDTO {
     @MaxLength(32)
     asalSekolah: string
 
-    @IsOptional()
-    @IsNumber()
-    @Max(100)
+    @IsNumberString()
+    @MaxLength(3)
     rerataRapor: number
 
     @IsString()
     @IsOptional()
-    @MaxLength(32)
+    @MaxLength(50)
     prestasi: string
+
+    @IsString()
+    nisn: string
 }

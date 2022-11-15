@@ -9,11 +9,11 @@ export class RegistrasiRepository extends Repository<Registrasi> {
         super(Registrasi, dataSource.createEntityManager())
     }
 
-    async createRegistration(noPendaftaran: number) {
+    async createRegistration(noPendaftaran: number, biayaPendaftaran: number) {
         const today = new Date();
         var tomorrow = new Date().setTime(today.getTime() + (24 * 60 * 60 * 1000))
 
-        const nominalTransfer = 219000 + noPendaftaran
+        const nominalTransfer = biayaPendaftaran + noPendaftaran
         const registration = this.create({
             noPendaftaran,
             waktuDaftar: today.getTime().toString(),
@@ -37,8 +37,8 @@ export class RegistrasiRepository extends Repository<Registrasi> {
 
     async getRegistrasiByNoPendaftaran(noPendaftaran: number) {
         const registrasi = await this.findOneBy({ noPendaftaran })
-        
-        if(!registrasi) {
+
+        if (!registrasi) {
             throw new NotFoundException(
                 `Registrasi dengan nomor pendaftaran ${noPendaftaran} tidak ditemukan`
             )
@@ -54,7 +54,7 @@ export class RegistrasiRepository extends Repository<Registrasi> {
             }
         })
 
-        if(!registrasiArray) {
+        if (!registrasiArray) {
             throw new NotFoundException(
                 `Data registrasi tidak ditemukan`
             )
@@ -67,7 +67,7 @@ export class RegistrasiRepository extends Repository<Registrasi> {
             let id = registrasiArray[index].id
 
             try {
-                await this.update({id}, { status: statusRegistrasi})
+                await this.update({ id }, { status: statusRegistrasi })
             } catch (error) {
                 errorResponse = error
             }
@@ -85,7 +85,7 @@ export class RegistrasiRepository extends Repository<Registrasi> {
     async updateStatusByID(id: string, statusRegistrasi: StatusRegistrasi) {
         const registrasi = await this.findOneBy({ id })
 
-        if(!registrasi) {
+        if (!registrasi) {
             throw new NotFoundException(
                 `Registrasi dengan id ${id} tidak ditemukan`
             )
@@ -97,7 +97,7 @@ export class RegistrasiRepository extends Repository<Registrasi> {
     async updateReceipt(id: string, buktiTransaksi: string) {
         const registrasi = await this.findOneBy({ id })
 
-        if(!registrasi) {
+        if (!registrasi) {
             throw new NotFoundException(
                 `Registrasi dengan id ${id} tidak ditemukan`
             )
@@ -109,7 +109,7 @@ export class RegistrasiRepository extends Repository<Registrasi> {
     async getReceipt(id: string) {
         const registrasi = await this.findOneBy({ id })
 
-        if(!registrasi) {
+        if (!registrasi) {
             throw new NotFoundException(
                 `Registrasi dengan id ${id} tidak ditemukan`
             )
@@ -121,7 +121,7 @@ export class RegistrasiRepository extends Repository<Registrasi> {
     async getByID(id: string) {
         const registrasi = await this.findOneBy({ id })
 
-        if(!registrasi) {
+        if (!registrasi) {
             throw new NotFoundException(
                 `Registrasi dengan id ${id} tidak ditemukan`
             )
