@@ -7,12 +7,12 @@ import { Akun } from 'src/auth/model';
 import { UpdateOneStatusDTO } from './model/dto/update-one-status.dto';
 import { UpdateStatusDTO } from './model/dto/update-status.dto';
 import { RegistrasiService } from './registrasi.service';
-import { editFileName, imageFileFilter } from './upload-image.helper';
+import { editFileName } from './upload-image.helper';
 
 @Controller('registrasi')
 @UseGuards(AuthGuard('jwt'))
 export class RegistrasiController {
-    constructor(private registrasiService: RegistrasiService) {}
+    constructor(private registrasiService: RegistrasiService) { }
 
     @Patch('statusRegistrasi')
     async updateStatusByIDs(
@@ -36,8 +36,7 @@ export class RegistrasiController {
             storage: diskStorage({
                 destination: './receipts',
                 filename: editFileName,
-            }),
-            fileFilter: imageFileFilter,
+            })
         })
     )
     async uploadReceipt(
@@ -73,7 +72,7 @@ export class RegistrasiController {
         return await this.registrasiService.cancelUpload(id, akun)
     }
 
-    @Get('statusCount') 
+    @Get('statusCount')
     async getStatusCount(
         @GetAkun() akun: Akun
     ) {
