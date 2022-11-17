@@ -1,7 +1,7 @@
 import {
     IsEnum, IsMobilePhone, IsNotEmpty,
-    IsNumber, IsNumberString, IsOptional, IsString,
-    IsUUID, Matches, Max, MaxLength
+    IsNumberString, IsOptional, IsString,
+    IsUUID, Matches, MaxLength
 } from "class-validator"
 import { TipeAkun } from "../enum/tipe-akun.enum"
 

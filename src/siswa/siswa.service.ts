@@ -9,6 +9,7 @@ import { SekolahRepository } from 'src/sekolah/sekolah.repository';
 import { TipeSekolahRepository } from 'src/sekolah/tipe-sekolah.repository';
 import { In } from 'typeorm';
 import { SiswaRepository } from './siswa.repository';
+import * as ExcelJS from 'exceljs'
 
 @Injectable()
 export class SiswaService {
@@ -162,5 +163,88 @@ export class SiswaService {
             message: "Sukses mengambil data siswa",
             data: finalResponse
         }
+    }
+
+    async getSiswaExcelReport(akun: Akun) {
+        const workbook = new ExcelJS.Workbook()
+        const user = "Fahmi Dzulqarnain - PPDB Al Kahfi Batam"
+
+        workbook.creator = user
+        workbook.lastModifiedBy = user
+        workbook.created = new Date()
+
+        const data = (await this.getAllSiswaByAdmin(akun)).data
+
+        for (let i = 0; i < data.length; i++) {
+            const tipeSekolah: TipeSekolah = data[i].tipeSekolah
+            const siswaList = data[i].siswa
+            const namaTipe = tipeSekolah.namaTipe
+
+            const sheet = workbook.addWorksheet(namaTipe, {
+                views: [
+                    { showGridLines: false },
+                    {
+                        state: 'frozen',
+                        xSplit: 1,
+                        ySplit: 2
+                    }
+                ]
+            })
+
+            const content = []
+
+            for (let index = 0; index < siswaList.length; index++) {
+                const siswa = siswaList[index]
+                const orangTua = siswa.idOrangTua
+
+                const row = [
+                    siswa.namaLengkap,
+                    siswa.nisn || "",
+                    siswa.tempatLahir,
+                    siswa.tanggalLahir,
+                    siswa.asalSekolah,
+                    orangTua.namaAyah,
+                    orangTua.hpAyah,
+                    orangTua.namaIbu,
+                    orangTua.hpIbu,
+                    orangTua.alamat,
+                    orangTua.kelurahan,
+                    orangTua.kecamatan,
+                    siswa.rerataRapor,
+                    siswa.prestasi
+                ]
+
+                content.push(row)
+            }
+
+            sheet.addTable({
+                name: namaTipe,
+                ref: 'A1',
+                headerRow: true,
+                style: {
+                    theme: 'TableStyleDark3',
+                    showRowStripes: true,
+                },
+                columns: [
+                    { name: 'namaLengkap' },
+                    { name: 'nisn' },
+                    { name: 'tempatLahir', filterButton: false },
+                    { name: 'tanggalLahir' },
+                    { name: 'asalSekolah', filterButton: true },
+                    { name: 'namaAyah' },
+                    { name: 'hpAyah' },
+                    { name: 'namaIbu' },
+                    { name: 'hpIbu' },
+                    { name: 'alamat' },
+                    { name: 'kelurahan', filterButton: true },
+                    { name: 'kecamatan', filterButton: true },
+                    { name: 'rerataRapor' },
+                    { name: 'prestasi' }
+                ],
+                rows: content
+            });
+        }
+
+        return workbook.xlsx
     }
 }
