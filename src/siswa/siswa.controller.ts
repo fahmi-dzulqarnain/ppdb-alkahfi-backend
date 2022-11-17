@@ -44,6 +44,6 @@ export class SiswaController {
             )
         }
 
-        return response.sendFile(excelReport)
+        return response.sendFile(excelReport, { root: './reports' })
     }
 }

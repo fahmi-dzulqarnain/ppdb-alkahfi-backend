@@ -166,6 +166,17 @@ export class SiswaService {
     }
 
     async getSiswaExcelReport(akun: Akun) {
+        if (akun.tipeAkun != TipeAkun.adminSekolah) {
+            throw new UnauthorizedException(
+                'Akun Anda tidak dapat mengakses jalur ini, ini adalah jalur admin sekolah'
+            )
+        }
+
+        const tipeSekolah: unknown = akun.idTipeSekolah
+        const idTipeSekolah = tipeSekolah as TipeSekolah
+        const sekolah = await this.sekolahRepository.findOneBy({ idSekolah: idTipeSekolah.idSekolah })
+        const namaSekolah = sekolah.namaSekolah
+
         const workbook = new ExcelJS.Workbook()
         const user = "Fahmi Dzulqarnain - PPDB Al Kahfi Batam"
 
@@ -185,8 +196,8 @@ export class SiswaService {
                     { showGridLines: false },
                     {
                         state: 'frozen',
-                        xSplit: 1,
-                        ySplit: 2
+                        xSplit: 2,
+                        ySplit: 1
                     }
                 ]
             })
@@ -198,6 +209,7 @@ export class SiswaService {
                 const orangTua = siswa.idOrangTua
 
                 const row = [
+                    index + 1,
                     siswa.namaLengkap,
                     siswa.nisn || "",
                     siswa.tempatLahir,
@@ -218,33 +230,36 @@ export class SiswaService {
             }
 
             sheet.addTable({
-                name: namaTipe,
+                name: namaTipe.replace(' ', '_'),
                 ref: 'A1',
                 headerRow: true,
                 style: {
-                    theme: 'TableStyleDark3',
                     showRowStripes: true,
                 },
                 columns: [
-                    { name: 'namaLengkap' },
-                    { name: 'nisn' },
-                    { name: 'tempatLahir', filterButton: false },
-                    { name: 'tanggalLahir' },
-                    { name: 'asalSekolah', filterButton: true },
-                    { name: 'namaAyah' },
-                    { name: 'hpAyah' },
-                    { name: 'namaIbu' },
-                    { name: 'hpIbu' },
-                    { name: 'alamat' },
-                    { name: 'kelurahan', filterButton: true },
-                    { name: 'kecamatan', filterButton: true },
-                    { name: 'rerataRapor' },
-                    { name: 'prestasi' }
+                    { name: 'No' },
+                    { name: 'Nama Lengkap' },
+                    { name: 'NISN' },
+                    { name: 'Tempat Lahir', filterButton: false },
+                    { name: 'Tanggal Lahir' },
+                    { name: 'Asal Sekolah', filterButton: true },
+                    { name: 'Nama Ayah' },
+                    { name: 'HP Ayah' },
+                    { name: 'Nama Ibu' },
+                    { name: 'HP Ibu' },
+                    { name: 'Alamat' },
+                    { name: 'Kelurahan', filterButton: true },
+                    { name: 'Kecamatan', filterButton: true },
+                    { name: 'Rerata Rapor' },
+                    { name: 'Prestasi' }
                 ],
                 rows: content
             });
         }
 
-        return workbook.xlsx
+        const fileName = `${namaSekolah} ${new Date().toDateString()}.xlsx`
+        await workbook.xlsx.writeFile(`./reports/${fileName}`);
+
+        return fileName
     }
 }

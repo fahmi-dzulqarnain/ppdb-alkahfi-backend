@@ -66,6 +66,7 @@ export class RegistrasiService {
         const halfMb = 2000 * 1000
         const fileType = receipt.mimetype
         const fileSize = receipt.size
+        const receiptName = receipt.filename
         const permittedFiles = [
             "image/png",
             "image/jpeg",
@@ -73,10 +74,12 @@ export class RegistrasiService {
         ]
 
         if (fileSize > halfMb) {
+            this.deletePicture(receiptName)
             throw new BadRequestException('Ukuran foto receipt maksimal 2 MB')
         }
 
         if (!permittedFiles.includes(fileType)) {
+            this.deletePicture(receiptName)
             throw new BadRequestException('Jenis foto receipt harus PNG/JPEG/JPG')
         }
 
@@ -86,7 +89,6 @@ export class RegistrasiService {
             this.deletePicture(registrasi.buktiTransaksi)
         }
 
-        const receiptName = `${receipt.filename}`
         const updateResult = this.registrasiRepository.updateReceipt(id, receiptName)
 
         return {
