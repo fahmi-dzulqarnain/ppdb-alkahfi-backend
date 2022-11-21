@@ -1,4 +1,5 @@
-import { Body, Controller, Get, ParseIntPipe, ParseUUIDPipe, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, ParseIntPipe, ParseUUIDPipe, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { GetAkun } from 'src/auth/get-akun.decorator';
 import { Akun } from 'src/auth/model';
 import { SekolahDTO } from './model';
@@ -44,6 +45,7 @@ export class SekolahController {
         return await this.sekolahService.updateTipeSekolahByID(id, dto)
     }
 
+    @UseGuards(AuthGuard('jwt'))
     @Patch('byID')
     async updateSekolahByID(
         @GetAkun() akun: Akun,
