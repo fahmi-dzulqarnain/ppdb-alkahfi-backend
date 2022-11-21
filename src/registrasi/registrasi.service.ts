@@ -155,7 +155,6 @@ export class RegistrasiService {
         }
 
         const idSekolah = tipeSekolah.idSekolah
-        console.log(idSekolah)
         const tipeSekolahArray = await this.tipeSekolahRepository.find({
             where: {
                 idSekolah
