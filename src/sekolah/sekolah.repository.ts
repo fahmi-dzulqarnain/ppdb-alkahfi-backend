@@ -1,6 +1,7 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { DataSource, Repository } from "typeorm";
 import { Sekolah, SekolahDTO } from "./model";
+import { SekolahUpdateDTO } from "./model/dto/sekolah-update.dto";
 
 @Injectable()
 export class SekolahRepository extends Repository<Sekolah> {
@@ -16,5 +17,22 @@ export class SekolahRepository extends Repository<Sekolah> {
         } catch (error) {
             return error
         }
+    }
+
+    async updateSekolah(idSekolah: number, dto: SekolahUpdateDTO) {
+        const sekolah = this.findOneBy({ idSekolah })
+
+        if (!sekolah) {
+            throw new NotFoundException(
+                `Sekolah dengan id ${idSekolah} tidak ditemukan`
+            )
+        }
+
+        const edited = {
+            idSekolah,
+            ...dto
+        }
+
+        return await this.save(edited)
     }
 }

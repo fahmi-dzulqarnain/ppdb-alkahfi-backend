@@ -1,4 +1,4 @@
-import { IsArray, IsNotEmpty, IsNumber, IsNumberString, IsString, IsUrl } from "class-validator"
+import { IsArray, IsNotEmpty, IsNumberString, IsString, IsUrl } from "class-validator"
 
 export class SekolahDTO {
     @IsString()
@@ -20,7 +20,7 @@ export class SekolahDTO {
     @IsString()
     @IsNotEmpty()
     namaRekening: string
-  
+
     @IsString()
     @IsNotEmpty()
     noRekening: string

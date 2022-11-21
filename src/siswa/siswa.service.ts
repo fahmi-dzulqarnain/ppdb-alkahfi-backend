@@ -176,6 +176,7 @@ export class SiswaService {
         const idTipeSekolah = tipeSekolah as TipeSekolah
         const sekolah = await this.sekolahRepository.findOneBy({ idSekolah: idTipeSekolah.idSekolah })
         const namaSekolah = sekolah.namaSekolah
+        const idSekolah = sekolah.idSekolah
 
         const workbook = new ExcelJS.Workbook()
         const user = "Fahmi Dzulqarnain - PPDB Al Kahfi Batam"
@@ -207,11 +208,15 @@ export class SiswaService {
             for (let index = 0; index < siswaList.length; index++) {
                 const siswa = siswaList[index]
                 const orangTua = siswa.idOrangTua
+                const registrasi = siswa.idRegistrasi
+                const noPendaftaran = `${idSekolah}`.padStart(3, "0") + "-" + `${registrasi.noPendaftaran}`.padStart(3, "0")
 
                 const row = [
                     index + 1,
                     siswa.namaLengkap,
                     siswa.nisn || "",
+                    noPendaftaran,
+                    registrasi.status,
                     siswa.tempatLahir,
                     siswa.tanggalLahir,
                     siswa.asalSekolah,
@@ -240,7 +245,9 @@ export class SiswaService {
                     { name: 'No' },
                     { name: 'Nama Lengkap' },
                     { name: 'NISN' },
-                    { name: 'Tempat Lahir', filterButton: false },
+                    { name: 'No Pendaftaran' },
+                    { name: 'Status Pendaftaran', filterButton: true },
+                    { name: 'Tempat Lahir', filterButton: true },
                     { name: 'Tanggal Lahir' },
                     { name: 'Asal Sekolah', filterButton: true },
                     { name: 'Nama Ayah' },

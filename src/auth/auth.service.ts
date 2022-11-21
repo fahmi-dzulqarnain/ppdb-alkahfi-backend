@@ -9,6 +9,7 @@ import { LoginDTO, RegisterDTO } from './model/dto';
 import { TipeSekolahRepository } from 'src/sekolah/tipe-sekolah.repository';
 import * as bcrypt from 'bcrypt'
 import { SekolahRepository } from 'src/sekolah/sekolah.repository';
+import { Akun } from './model';
 
 @Injectable()
 export class AuthService {
@@ -75,5 +76,66 @@ export class AuthService {
             tipeAkun,
             accessToken
         }
+    }
+
+    async deleteAccount(registrasionID: string, akunValidation: Akun) {
+        var result = []
+        const registrasionData = await this.registerRepository.findOneBy({
+            id: registrasionID
+        })
+
+        if (!registrasionData) {
+            throw new NotFoundException(
+                `Data registrasi dengan id ${registrasionID} tidak ditemukan`
+            )
+        }
+
+        const noPendaftaran = registrasionData.noPendaftaran
+        const akun = await this.akunRepository.findOneBy({ noPendaftaran })
+
+        if (!akun) {
+            throw new NotFoundException(
+                `Data akun dengan no pendaftaran ${noPendaftaran} tidak ditemukan`
+            )
+        }
+
+        const waliSiswa = await this.waliSiswaRepository.findOneBy({
+            hpAyah: akun.username
+        })
+
+        if (waliSiswa) {
+            const idOrangTua = waliSiswa.id
+            const siswa = await this.siswaRepository.findOneBy({
+                idOrangTua
+            })
+
+            if (siswa) {
+                result.push(await this.siswaRepository.delete({ idOrangTua }))
+            }
+
+            result.push(await this.waliSiswaRepository.delete({ id: idOrangTua }))
+        }
+
+        const siswa = await this.siswaRepository.findOneBy({
+            nisn: akun.username
+        })
+
+        if (siswa) {
+            const idOrangTua = siswa.idOrangTua
+            const orangTua = await this.siswaRepository.findOneBy({
+                idOrangTua
+            })
+
+            result.push(await this.siswaRepository.delete({ idOrangTua }))
+
+            if (orangTua) {
+                result.push(await this.waliSiswaRepository.delete({ id: idOrangTua }))
+            }
+        }
+
+        result.push(await this.akunRepository.delete({ noPendaftaran }))
+        result.push(await this.registerRepository.delete({ id: registrasionData.id }))
+
+        return result
     }
 }

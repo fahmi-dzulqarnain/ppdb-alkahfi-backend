@@ -1,7 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Akun } from 'src/auth/model';
+import { TipeAkun } from 'src/auth/model/enum/tipe-akun.enum';
 import { SekolahDTO } from './model';
 import { TipeSekolahDTO } from './model/dto';
+import { SekolahUpdateDTO } from './model/dto/sekolah-update.dto';
 import { TipeSekolahUpdateDTO } from './model/dto/tipe-sekolah-update.dto';
 import { SekolahRepository } from './sekolah.repository';
 import { TipeSekolahRepository } from './tipe-sekolah.repository';
@@ -13,7 +16,7 @@ export class SekolahService {
         private sekolahRepository: SekolahRepository,
         @InjectRepository(TipeSekolahRepository)
         private tipeSekolahRepository: TipeSekolahRepository
-    ) {}
+    ) { }
 
     async getAll() {
         return await this.sekolahRepository.find()
@@ -21,16 +24,16 @@ export class SekolahService {
 
     async getByID(idSekolah: number) {
         if (idSekolah) {
-            const sekolah = await this.sekolahRepository.findOneBy({ 
-                idSekolah 
+            const sekolah = await this.sekolahRepository.findOneBy({
+                idSekolah
             })
-    
-            if(!sekolah) {
+
+            if (!sekolah) {
                 throw new NotFoundException(
                     `Sekolah dengan id ${idSekolah} tidak ditemukan.`
                 )
             }
-    
+
             return sekolah
         }
     }
@@ -45,7 +48,7 @@ export class SekolahService {
             idSekolah
         })
 
-        if(!sekolah) {
+        if (!sekolah) {
             throw new NotFoundException(
                 `Sekolah dengan id ${idSekolah} tidak ditemukan.`
             )
@@ -65,9 +68,9 @@ export class SekolahService {
     }
 
     async getTipeSekolahByID(id: string) {
-        const tipeSekolah = this.tipeSekolahRepository.findOneBy({id})
+        const tipeSekolah = this.tipeSekolahRepository.findOneBy({ id })
 
-        if(!tipeSekolah) {
+        if (!tipeSekolah) {
             throw new NotFoundException(
                 `Tipe sekolah dengan id ${id} tidak ditemukan`
             )
@@ -79,7 +82,7 @@ export class SekolahService {
     async updateTipeSekolahByID(id: string, dto: Partial<TipeSekolahUpdateDTO>) {
         const existing = await this.getTipeSekolahByID(id)
 
-        if(!existing) {
+        if (!existing) {
             throw new NotFoundException(
                 `Tipe sekolah dengan id ${id} tidak ditemukan`
             )
@@ -91,5 +94,19 @@ export class SekolahService {
         }
 
         return await this.tipeSekolahRepository.save(edited)
+    }
+
+    async updateSekolahByID(akun: Akun, dto: Partial<SekolahUpdateDTO>) {
+        if (akun.tipeAkun != TipeAkun.adminSekolah) {
+            throw new ForbiddenException(
+                `Rute ini khusus untuk admin sekolah`
+            )
+        }
+
+        const idTipeSekolah = akun.idTipeSekolah
+        const tipeSekolah = await this.getTipeSekolahByID(idTipeSekolah)
+        const idSekolah = tipeSekolah.idSekolah
+
+        return await this.sekolahRepository.updateSekolah(idSekolah, dto)
     }
 }

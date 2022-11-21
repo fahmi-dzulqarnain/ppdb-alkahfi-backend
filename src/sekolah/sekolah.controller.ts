@@ -1,12 +1,15 @@
 import { Body, Controller, Get, ParseIntPipe, ParseUUIDPipe, Patch, Post, Query } from '@nestjs/common';
+import { GetAkun } from 'src/auth/get-akun.decorator';
+import { Akun } from 'src/auth/model';
 import { SekolahDTO } from './model';
 import { TipeSekolahDTO } from './model/dto';
+import { SekolahUpdateDTO } from './model/dto/sekolah-update.dto';
 import { TipeSekolahUpdateDTO } from './model/dto/tipe-sekolah-update.dto';
 import { SekolahService } from './sekolah.service';
 
 @Controller('sekolah')
 export class SekolahController {
-    constructor(private sekolahService: SekolahService) {}
+    constructor(private sekolahService: SekolahService) { }
 
     @Post()
     async createSekolah(@Body() dto: SekolahDTO) {
@@ -34,7 +37,18 @@ export class SekolahController {
     }
 
     @Patch('tipeSekolah')
-    async updateTipeSekolahByID(@Query('id', ParseUUIDPipe) id: string, @Body() dto: Partial<TipeSekolahUpdateDTO>) {
+    async updateTipeSekolahByID(
+        @Query('id', ParseUUIDPipe) id: string,
+        @Body() dto: Partial<TipeSekolahUpdateDTO>
+    ) {
         return await this.sekolahService.updateTipeSekolahByID(id, dto)
+    }
+
+    @Patch('byID')
+    async updateSekolahByID(
+        @GetAkun() akun: Akun,
+        @Body() updateDTO: Partial<SekolahUpdateDTO>
+    ) {
+        return this.sekolahService.updateSekolahByID(akun, updateDTO)
     }
 }
