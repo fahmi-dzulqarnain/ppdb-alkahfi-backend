@@ -10,6 +10,7 @@ import { TipeSekolahRepository } from 'src/sekolah/tipe-sekolah.repository';
 import * as bcrypt from 'bcrypt'
 import { SekolahRepository } from 'src/sekolah/sekolah.repository';
 import { Akun } from './model';
+import { TipeAkun } from './model/enum/tipe-akun.enum';
 
 @Injectable()
 export class AuthService {
@@ -79,6 +80,10 @@ export class AuthService {
     }
 
     async deleteAccount(registrasionID: string, akunValidation: Akun) {
+        if (akunValidation.tipeAkun != TipeAkun.adminSekolah) {
+            throw new ForbiddenException('Rute ini tidak diizinkan untuk Anda!')
+        }
+
         var result = []
         const registrasionData = await this.registerRepository.findOneBy({
             id: registrasionID

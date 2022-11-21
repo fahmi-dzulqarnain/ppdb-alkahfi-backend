@@ -1,4 +1,5 @@
-import { Body, Controller, Delete, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Post, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { GetAkun } from './get-akun.decorator';
 import { Akun } from './model';
@@ -18,6 +19,7 @@ export class AuthController {
         return await this.authService.signIn(dto)
     }
 
+    @UseGuards(AuthGuard('jwt'))
     @Delete('sudo')
     async deleteAccount(
         @GetAkun() akun: Akun,
