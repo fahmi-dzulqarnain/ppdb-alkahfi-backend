@@ -20,7 +20,7 @@ export class Sekolah {
 
     @Column()
     namaRekening: string
-  
+
     @Column()
     noRekening: string
 
@@ -40,8 +40,11 @@ export class Sekolah {
     biayaSPP: number
 
     @OneToMany(() => TipeSekolah, (tipeSekolah) => tipeSekolah.idSekolah, {
-        cascade: true, 
+        cascade: true,
         eager: true
     })
     tipeSekolah: TipeSekolah[]
+
+    @Column('boolean', { default: true })
+    isRegistrationOpen: boolean = true
 }
