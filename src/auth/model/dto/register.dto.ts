@@ -1,7 +1,7 @@
 import {
     IsEnum, IsInt, IsMobilePhone, IsNotEmpty,
     IsOptional, IsString,
-    IsUUID, Matches, MaxLength
+    IsUUID, Matches, Max, MaxLength
 } from "class-validator"
 import { TipeAkun } from "../enum/tipe-akun.enum"
 
@@ -73,8 +73,8 @@ export class RegisterDTO {
     @MaxLength(32)
     asalSekolah: string
 
-    @IsInt()
-    @MaxLength(3)
+    @IsInt({ message: "Rerata rapor hanya boleh angka tanpa koma" })
+    @Max(100, { message: "Rerata rapor tidak boleh lebih dari 100" })
     rerataRapor: number
 
     @IsString()
