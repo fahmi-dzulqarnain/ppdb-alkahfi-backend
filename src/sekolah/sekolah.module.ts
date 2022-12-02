@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { LiniMasaRepository } from './lini-masa.repository';
 import { LiniMasa, Sekolah, TipeSekolah } from './model';
 import { SekolahController } from './sekolah.controller';
 import { SekolahRepository } from './sekolah.repository';
@@ -16,11 +17,12 @@ import { TipeSekolahRepository } from './tipe-sekolah.repository';
   providers: [
     SekolahService,
     SekolahRepository,
-    TipeSekolahRepository
+    TipeSekolahRepository,
+    LiniMasaRepository
   ],
   exports: [
     SekolahRepository,
     TipeSekolahRepository
   ]
 })
-export class SekolahModule {}
+export class SekolahModule { }

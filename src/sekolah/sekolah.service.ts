@@ -2,8 +2,10 @@ import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/commo
 import { InjectRepository } from '@nestjs/typeorm';
 import { Akun } from 'src/auth/model';
 import { TipeAkun } from 'src/auth/model/enum/tipe-akun.enum';
-import { SekolahDTO } from './model';
+import { LiniMasaRepository } from './lini-masa.repository';
+import { SekolahDTO, TipeSekolah } from './model';
 import { TipeSekolahDTO } from './model/dto';
+import { LiniMasaDTO } from './model/dto/lini-masa.dto';
 import { SekolahUpdateDTO } from './model/dto/sekolah-update.dto';
 import { TipeSekolahUpdateDTO } from './model/dto/tipe-sekolah-update.dto';
 import { SekolahRepository } from './sekolah.repository';
@@ -15,7 +17,9 @@ export class SekolahService {
         @InjectRepository(SekolahRepository)
         private sekolahRepository: SekolahRepository,
         @InjectRepository(TipeSekolahRepository)
-        private tipeSekolahRepository: TipeSekolahRepository
+        private tipeSekolahRepository: TipeSekolahRepository,
+        @InjectRepository(LiniMasaRepository)
+        private liniMasaRepository: LiniMasaRepository
     ) { }
 
     async getAll() {
@@ -103,10 +107,52 @@ export class SekolahService {
             )
         }
 
-        const idTipeSekolah = akun.idTipeSekolah
-        const tipeSekolah = await this.getTipeSekolahByID(idTipeSekolah)
-        const idSekolah = tipeSekolah.idSekolah
+        const idSekolah = await this.getSekolahIDFromAkun(akun)
 
         return await this.sekolahRepository.updateSekolah(idSekolah, dto)
+    }
+
+    async getSekolahIDFromAkun(akun: Akun) {
+        const idTipeSekolah: unknown = akun.idTipeSekolah
+        const id = idTipeSekolah as TipeSekolah
+        const tipeSekolah = await this.getTipeSekolahByID(id.id)
+
+        return tipeSekolah.idSekolah
+    }
+
+    async createLiniMasa(akun: Akun, dto: LiniMasaDTO) {
+        if (akun.tipeAkun != TipeAkun.adminSekolah) {
+            throw new ForbiddenException(
+                `Rute ini khusus untuk admin sekolah`
+            )
+        }
+
+        const idSekolah = await this.getSekolahIDFromAkun(akun)
+
+        return await this.liniMasaRepository.createLiniMasa(idSekolah, dto)
+    }
+
+    async updateLiniMasa(akun: Akun, id: string, dto: LiniMasaDTO) {
+        if (akun.tipeAkun != TipeAkun.adminSekolah) {
+            throw new ForbiddenException(
+                `Rute ini khusus untuk admin sekolah`
+            )
+        }
+
+        return await this.liniMasaRepository.updateLiniMasa(id, dto)
+    }
+
+    async deleteLiniMasa(akun: Akun, id: string) {
+        if (akun.tipeAkun != TipeAkun.adminSekolah) {
+            throw new ForbiddenException(
+                `Rute ini khusus untuk admin sekolah`
+            )
+        }
+
+        return await this.liniMasaRepository.deleteLiniMasa(id)
+    }
+
+    async getLiniMasa(idSekolah: number) {
+        return await this.liniMasaRepository.getAllByIDSekolah(idSekolah)
     }
 }

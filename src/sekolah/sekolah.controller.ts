@@ -1,9 +1,10 @@
-import { Body, Controller, Get, ParseIntPipe, ParseUUIDPipe, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, ParseIntPipe, ParseUUIDPipe, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { GetAkun } from 'src/auth/get-akun.decorator';
 import { Akun } from 'src/auth/model';
 import { SekolahDTO } from './model';
 import { TipeSekolahDTO } from './model/dto';
+import { LiniMasaDTO } from './model/dto/lini-masa.dto';
 import { SekolahUpdateDTO } from './model/dto/sekolah-update.dto';
 import { TipeSekolahUpdateDTO } from './model/dto/tipe-sekolah-update.dto';
 import { SekolahService } from './sekolah.service';
@@ -37,6 +38,7 @@ export class SekolahController {
         return await this.sekolahService.getTipeSekolahBySekolahID(idSekolah)
     }
 
+    @UseGuards(AuthGuard('jwt'))
     @Patch('tipeSekolah')
     async updateTipeSekolahByID(
         @Query('id', ParseUUIDPipe) id: string,
@@ -51,6 +53,41 @@ export class SekolahController {
         @GetAkun() akun: Akun,
         @Body() updateDTO: Partial<SekolahUpdateDTO>
     ) {
-        return this.sekolahService.updateSekolahByID(akun, updateDTO)
+        return await this.sekolahService.updateSekolahByID(akun, updateDTO)
+    }
+
+    @UseGuards(AuthGuard('jwt'))
+    @Post('liniMasa')
+    async createLiniMasa(
+        @GetAkun() akun: Akun,
+        @Body() dto: LiniMasaDTO
+    ) {
+        return await this.sekolahService.createLiniMasa(akun, dto)
+    }
+
+    @UseGuards(AuthGuard('jwt'))
+    @Patch('liniMasa')
+    async updateLiniMasaByID(
+        @GetAkun() akun: Akun,
+        @Query('id', ParseUUIDPipe) id: string,
+        @Body() dto: LiniMasaDTO
+    ) {
+        return await this.sekolahService.updateLiniMasa(akun, id, dto)
+    }
+
+    @UseGuards(AuthGuard('jwt'))
+    @Delete('liniMasa')
+    async deleteLiniMasaByID(
+        @GetAkun() akun: Akun,
+        @Body('id', ParseUUIDPipe) id: string
+    ) {
+        return await this.sekolahService.deleteLiniMasa(akun, id)
+    }
+
+    @Get('liniMasa')
+    async getLiniMasaBySekolahID(
+        @Body('idSekolah', ParseIntPipe) idSekolah: number
+    ) {
+        return await this.sekolahService.getLiniMasa(idSekolah)
     }
 }

@@ -10,10 +10,10 @@ export class LiniMasa {
     @Column()
     idSekolah: number
 
-    @Column( { type: 'date' } )
+    @Column()
     startDate: string
 
-    @Column( { type: 'date' } )
+    @Column()
     endDate: string
 
     @Column()

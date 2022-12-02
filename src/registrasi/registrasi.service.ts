@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Akun } from 'src/auth/model';
 import { TipeAkun } from 'src/auth/model/enum/tipe-akun.enum';
@@ -217,5 +217,13 @@ export class RegistrasiService {
         return registrasiArray.filter(registrasi =>
             registrasi.status == status
         ).length
+    }
+
+    async extendTime(registrasionID: string, akunValidation: Akun) {
+        if (akunValidation.tipeAkun != TipeAkun.adminSekolah) {
+            throw new ForbiddenException('Rute ini tidak diizinkan untuk Anda!')
+        }
+
+        return await this.registrasiRepository.extendDeadline(registrasionID)
     }
 }

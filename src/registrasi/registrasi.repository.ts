@@ -106,6 +106,24 @@ export class RegistrasiRepository extends Repository<Registrasi> {
         return await this.update({ id }, { buktiTransaksi })
     }
 
+    async extendDeadline(id: string) {
+        const registrasi = await this.findOneBy({ id })
+
+        if (!registrasi) {
+            throw new NotFoundException(
+                `Registrasi dengan id ${id} tidak ditemukan`
+            )
+        }
+
+        const today = new Date();
+        const twelveHours = new Date().setTime(today.getTime() + (12 * 60 * 60 * 1000))
+
+        return await this.update({ id }, {
+            status: StatusRegistrasi.menunggu_pembayaran,
+            deadlineBayar: twelveHours.toString()
+        })
+    }
+
     async getReceipt(id: string) {
         const registrasi = await this.findOneBy({ id })
 

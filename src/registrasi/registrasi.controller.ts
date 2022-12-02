@@ -78,4 +78,12 @@ export class RegistrasiController {
     ) {
         return this.registrasiService.getAllStatusCount(akun)
     }
+
+    @Patch('extend')
+    async extendDeadline(
+        @GetAkun() akun: Akun,
+        @Body('registrationID') registrationID: string
+    ) {
+        return await this.registrasiService.extendTime(registrationID, akun)
+    }
 }
