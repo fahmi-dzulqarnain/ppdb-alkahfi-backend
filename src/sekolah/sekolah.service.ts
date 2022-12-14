@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Akun } from 'src/auth/model';
 import { TipeAkun } from 'src/auth/model/enum/tipe-akun.enum';
 import { LiniMasaRepository } from './lini-masa.repository';
-import { SekolahDTO, TipeSekolah } from './model';
+import { DetailSekolahModel, Sekolah, SekolahDTO, SekolahModel, TipeSekolah } from './model';
 import { TipeSekolahDTO } from './model/dto';
 import { LiniMasaDTO } from './model/dto/lini-masa.dto';
 import { SekolahUpdateDTO } from './model/dto/sekolah-update.dto';
@@ -23,7 +23,46 @@ export class SekolahService {
     ) { }
 
     async getAll() {
-        return await this.sekolahRepository.find()
+        var sekolahData = await this.sekolahRepository.find()
+        sekolahData = sekolahData.sort((firstSchool, secondSchool) =>
+            firstSchool.orderNumber - secondSchool.orderNumber
+        )
+
+        const result: SekolahModel[] = []
+
+        sekolahData.forEach((sekolah) => {
+            var existingSekolah = result.find(school => school.namaSekolah == sekolah.namaSekolah)
+
+            const detailSekolah: DetailSekolahModel = {
+                idSekolah: sekolah.idSekolah,
+                alamat: sekolah.alamat,
+                kontak: sekolah.kontak,
+                namaRekening: sekolah.namaRekening,
+                noRekening: sekolah.noRekening,
+                syarat: sekolah.syarat,
+                linkWAGroup: sekolah.linkWAGroup,
+                biayaPendaftaran: sekolah.biayaPendaftaran,
+                biayaAwal: sekolah.biayaAwal,
+                biayaSPP: sekolah.biayaSPP,
+                tipeSekolah: sekolah.tipeSekolah,
+                isRegistrationOpen: sekolah.isRegistrationOpen
+            }
+
+            if (existingSekolah) {
+                existingSekolah.detail.push(detailSekolah)
+            } else {
+                const sekolahData: SekolahModel = {
+                    orderNumber: sekolah.orderNumber,
+                    namaSekolah: sekolah.namaSekolah,
+                    logo: sekolah.logo,
+                    detail: [detailSekolah]
+                }
+
+                result.push(sekolahData)
+            }
+        })
+
+        return result
     }
 
     async getByID(idSekolah: number) {

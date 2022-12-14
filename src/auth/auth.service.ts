@@ -31,26 +31,61 @@ export class AuthService {
     ) { }
 
     async registerAccount(dto: RegisterDTO) {
-        const createAccount = await this.akunRepository.createAccount(dto)
-        const akun = createAccount.akun
-        const idTipeSekolah = akun.idTipeSekolah
-        const tipeSekolah = await this.tipeSekolahRepository.findOneBy({ id: idTipeSekolah })
-        const idSekolah = tipeSekolah.idSekolah
-        const sekolah = await this.sekolahRepository.findOneBy({ idSekolah })
-        const register = await this.registerRepository.createRegistration(akun.noPendaftaran, sekolah.biayaPendaftaran)
-        const idRegistrasi = register.idRegistrasi
-        const waliSiswa = await this.waliSiswaRepository.createWaliSiswa(dto)
-        const idOrangTua = waliSiswa.idOrangTua
-        const siswa = await this.siswaRepository.createSiswa(dto, idRegistrasi, idOrangTua)
+        const idTipeSekolah = dto.idTipeSekolah
+        const isAvailable = await this.tipeSekolahRepository.checkAvailability(idTipeSekolah)
 
-        if (siswa) {
-            await this.tipeSekolahRepository.substractSisaKuota(idTipeSekolah)
+        if (isAvailable) {
+            const tipeSekolah = await this.tipeSekolahRepository.findTipeSekolahByID(idTipeSekolah)
+            const idSekolah = tipeSekolah.idSekolah
+            const sekolah = await this.sekolahRepository.findOneBy({ idSekolah })
+            const namaSekolah = sekolah.namaSekolah.toLowerCase()
+            const minimumDateString = "2023-07-30"
+
+            if (namaSekolah.includes("tk")) {
+                if (tipeSekolah.namaTipe.toLowerCase() == "tk a") {
+                    const minimumAge = 4
+
+                    if (!this.isAgeQualified(dto.tanggalLahir, minimumDateString, minimumAge)) {
+                        return this.minimumAgeError(minimumAge)
+                    }
+                } else if (tipeSekolah.namaTipe.toLowerCase() == "tk b") {
+                    const minimumAge = 5
+
+                    if (!this.isAgeQualified(dto.tanggalLahir, minimumDateString, minimumAge)) {
+                        return this.minimumAgeError(minimumAge)
+                    }
+                }
+            } else if (namaSekolah.includes("sd")) {
+                const minimumAge = 6
+
+                if (!this.isAgeQualified(dto.tanggalLahir, minimumDateString, minimumAge)) {
+                    return this.minimumAgeError(minimumAge)
+                }
+            }
+
+            const createAccount = await this.akunRepository.createAccount(dto)
+            const akun = createAccount.akun
+            const register = await this.registerRepository.createRegistration(akun.noPendaftaran, sekolah.biayaPendaftaran)
+            const idRegistrasi = register.idRegistrasi
+            const waliSiswa = await this.waliSiswaRepository.createWaliSiswa(dto)
+            const idOrangTua = waliSiswa.idOrangTua
+            const siswa = await this.siswaRepository.createSiswa(dto, idRegistrasi, idOrangTua)
+
+            if (siswa) {
+                await this.tipeSekolahRepository.substractSisaKuota(idTipeSekolah)
+            }
+
+            return {
+                statusCode: 200,
+                title: "Pendaftaran Berhasil",
+                message: "Silakan masuk menggunakan Akun Anda!"
+            }
         }
 
         return {
-            statusCode: 200,
-            title: "Pendaftaran Berhasil",
-            message: "Silakan masuk menggunakan Akun Anda!"
+            statusCode: 406,
+            title: "Kuota Habis!",
+            message: "Mohon maaf, saat ini kuota pendaftaran telah habis"
         }
     }
 
@@ -142,5 +177,39 @@ export class AuthService {
         result.push(await this.registerRepository.delete({ id: registrasionData.id }))
 
         return result
+    }
+
+    isAgeQualified(birthDateString: string, minimumDateString: string, minimumAge: number) {
+        var isQualified = false
+        const birthDate = Date.parse(birthDateString)
+        const minimumDate = Date.parse(minimumDateString)
+        const calculateYear = minimumDate - birthDate
+        const ageByYear = new Date()
+        const minimumDateMonth = new Date()
+        const birthDateMonth = new Date()
+
+        ageByYear.setTime(calculateYear)
+        minimumDateMonth.setTime(minimumDate)
+        birthDateMonth.setTime(birthDate)
+
+        const ageYear = ageByYear.getFullYear() - 1970
+
+        if (ageYear > minimumAge) {
+            isQualified = true
+        } else if (ageYear == minimumAge) {
+            if (birthDateMonth.getMonth() <= minimumDateMonth.getMonth()) {
+                isQualified = true
+            }
+        }
+
+        return isQualified
+    }
+
+    minimumAgeError(minimumAge: number) {
+        return {
+            statusCode: 406,
+            title: "Usia Belum Mencukupi",
+            message: `Mohon maaf usia ananda belum cukup, minimal usia adalah ${minimumAge} pada `
+        }
     }
 }

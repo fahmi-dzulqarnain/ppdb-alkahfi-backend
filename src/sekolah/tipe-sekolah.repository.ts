@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotAcceptableException, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { DataSource, Repository } from "typeorm";
 import { TipeSekolah } from "./model";
 import { TipeSekolahDTO } from "./model/dto";
@@ -11,7 +11,7 @@ export class TipeSekolahRepository extends Repository<TipeSekolah> {
 
     async createTipeSekolah(dto: TipeSekolahDTO) {
         const tipeSekolah = this.create(dto)
-        
+
         try {
             return await this.save(tipeSekolah)
         } catch (error) {
@@ -20,16 +20,39 @@ export class TipeSekolahRepository extends Repository<TipeSekolah> {
     }
 
     async substractSisaKuota(id: string) {
+        const tipeSekolah = await this.findTipeSekolahByID(id)
+
+        tipeSekolah.sisaKuota -= 1
+
+        return this.update({ id }, tipeSekolah)
+    }
+
+    async findTipeSekolahByID(id: string) {
         const tipeSekolah = await this.findOneBy({ id })
-        
-        if(!tipeSekolah) {
+
+        if (!tipeSekolah) {
             throw new NotFoundException(
                 `Tidak ada tipe sekolah dengan id ${id}`
             )
         }
 
-        tipeSekolah.sisaKuota -= 1
+        return tipeSekolah
+    }
 
-        return this.update({ id }, tipeSekolah)
+    async checkAvailability(id: string) {
+        const tipeSekolah = await this.findTipeSekolahByID(id)
+        const namaTipe = tipeSekolah.namaTipe
+        const sisaKuota = tipeSekolah.sisaKuota
+
+        if (sisaKuota <= 0) {
+            throw new NotAcceptableException(
+                `Kuota ${namaTipe} telah habis`
+            )
+        }
+
+        return {
+            statusCode: 200,
+            message: `Kuota ${namaTipe} masih tersedia ${sisaKuota}`
+        }
     }
 }

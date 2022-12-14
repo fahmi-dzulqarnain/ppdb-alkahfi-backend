@@ -47,4 +47,7 @@ export class Sekolah {
 
     @Column('boolean', { default: true })
     isRegistrationOpen: boolean = true
+
+    @Column({ default: 0 })
+    orderNumber: number
 }
