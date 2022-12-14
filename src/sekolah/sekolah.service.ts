@@ -192,6 +192,15 @@ export class SekolahService {
     }
 
     async getLiniMasa(idSekolah: number) {
-        return await this.liniMasaRepository.getAllByIDSekolah(idSekolah)
+        const result = await this.liniMasaRepository.getAllByIDSekolah(idSekolah)
+        const finalResult = result.map(item => {
+            return {
+                startDate: item.startDate,
+                endDate: item.endDate,
+                kegiatan: item.kegiatan
+            }
+        })
+
+        return finalResult
     }
 }

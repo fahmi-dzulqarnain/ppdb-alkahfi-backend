@@ -86,7 +86,7 @@ export class SekolahController {
 
     @Get('liniMasa')
     async getLiniMasaBySekolahID(
-        @Body('idSekolah', ParseIntPipe) idSekolah: number
+        @Query('idSekolah', ParseIntPipe) idSekolah: number
     ) {
         return await this.sekolahService.getLiniMasa(idSekolah)
     }

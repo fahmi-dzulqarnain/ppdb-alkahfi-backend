@@ -23,7 +23,7 @@ export class LiniMasaRepository extends Repository<LiniMasa> {
     }
 
     async getAllByIDSekolah(idSekolah: number) {
-        return this.findBy({ idSekolah })
+        return await this.findBy({ idSekolah })
     }
 
     async getByID(id: string) {

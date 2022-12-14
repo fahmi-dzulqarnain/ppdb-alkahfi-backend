@@ -1,4 +1,4 @@
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Sekolah } from "./sekolah.entity";
 
 @Entity()
@@ -7,7 +7,7 @@ export class LiniMasa {
     id: string
 
     @OneToOne(() => Sekolah, (sekolah) => sekolah.idSekolah, { eager: true })
-    @Column()
+    @JoinColumn()
     idSekolah: number
 
     @Column()
