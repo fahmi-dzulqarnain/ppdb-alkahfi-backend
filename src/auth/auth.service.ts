@@ -199,7 +199,7 @@ export class AuthService {
         if (ageYear > minimumAge) {
             isQualified = true
         } else if (ageYear == minimumAge) {
-            if (birthDateMonth.getMonth() <= minimumDateMonth.getMonth()) {
+            if (birthDateMonth.getMonth() >= minimumDateMonth.getMonth()) {
                 isQualified = true
             }
         }
