@@ -166,7 +166,7 @@ export class AuthService {
                 idOrangTua
             })
 
-            result.push(await this.siswaRepository.delete({ idOrangTua }))
+            result.push(await this.siswaRepository.delete(siswa))
 
             if (orangTua) {
                 result.push(await this.waliSiswaRepository.delete({ id: idOrangTua }))
@@ -179,8 +179,10 @@ export class AuthService {
         return result
     }
 
-    isAgeQualified(birthDateString: string, minimumDateString: string, minimumAge: number) {
+    isAgeQualified(birthDateStr: string, minimumDateString: string, minimumAge: number) {
         var isQualified = false
+        const birthDateArray = birthDateStr.split("-")
+        const birthDateString = `${birthDateArray[2]}-${birthDateArray[1]}-${birthDateArray[0]}`
         const birthDate = Date.parse(birthDateString)
         const minimumDate = Date.parse(minimumDateString)
         const calculateYear = minimumDate - birthDate
@@ -208,8 +210,8 @@ export class AuthService {
     minimumAgeError(minimumAge: number) {
         return {
             statusCode: 406,
-            title: "Usia Belum Mencukupi",
-            message: `Mohon maaf usia ananda belum cukup, minimal usia adalah ${minimumAge} pada `
+            error: "Usia Belum Mencukupi",
+            message: `Mohon maaf usia ananda belum cukup, minimal usia adalah ${minimumAge} tahun pada Juli 2023`
         }
     }
 }
