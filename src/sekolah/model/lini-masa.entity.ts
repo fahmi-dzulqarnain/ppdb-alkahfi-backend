@@ -1,13 +1,11 @@
-import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
-import { Sekolah } from "./sekolah.entity";
+import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class LiniMasa {
     @PrimaryGeneratedColumn('uuid')
     id: string
 
-    @OneToOne(() => Sekolah, (sekolah) => sekolah.idSekolah, { eager: true })
-    @JoinColumn()
+    @Column()
     idSekolah: number
 
     @Column()

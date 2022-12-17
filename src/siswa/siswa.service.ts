@@ -190,7 +190,7 @@ export class SiswaService {
         for (let i = 0; i < data.length; i++) {
             const tipeSekolah: TipeSekolah = data[i].tipeSekolah
             const siswaList = data[i].siswa
-            const namaTipe = tipeSekolah.namaTipe
+            const namaTipe = tipeSekolah.namaTipe.replace("'", "")
 
             const sheet = workbook.addWorksheet(namaTipe, {
                 views: [
