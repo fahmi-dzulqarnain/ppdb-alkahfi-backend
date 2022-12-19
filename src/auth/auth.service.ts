@@ -181,20 +181,21 @@ export class AuthService {
 
     isAgeQualified(birthDateStr: string, minimumDateString: string, minimumAge: number) {
         var isQualified = false
+        
         const birthDateArray = birthDateStr.split("-")
         const birthDateString = `${birthDateArray[2]}-${birthDateArray[1]}-${birthDateArray[0]}`
         const birthDate = Date.parse(birthDateString)
+        
+        const minDateArray = minimumDateString.split("-")
+        
         const minimumDate = Date.parse(minimumDateString)
-        const calculateYear = minimumDate - birthDate
-        const ageByYear = new Date()
         const minimumDateMonth = new Date()
         const birthDateMonth = new Date()
 
-        ageByYear.setTime(calculateYear)
         minimumDateMonth.setTime(minimumDate)
         birthDateMonth.setTime(birthDate)
 
-        const ageYear = ageByYear.getFullYear() - 1970
+        const ageYear = parseInt(minDateArray[0]) - parseInt(birthDateArray[2])
 
         if (ageYear > minimumAge) {
             isQualified = true
