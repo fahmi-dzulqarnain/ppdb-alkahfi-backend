@@ -196,7 +196,7 @@ export class AuthService {
 
         const ageYear = ageByYear.getFullYear() - 1970
 
-        if (ageYear > minimumAge) {
+        if (ageYear >= minimumAge) {
             isQualified = true
         } else if (ageYear == minimumAge) {
             if (birthDateMonth.getMonth() <= minimumDateMonth.getMonth()) {
