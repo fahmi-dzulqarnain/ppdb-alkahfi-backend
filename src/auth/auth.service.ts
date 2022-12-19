@@ -39,7 +39,7 @@ export class AuthService {
             const idSekolah = tipeSekolah.idSekolah
             const sekolah = await this.sekolahRepository.findOneBy({ idSekolah })
             const namaSekolah = sekolah.namaSekolah.toLowerCase()
-            const minimumDateString = "2023-07-30"
+            const minimumDateString = "2023-07-01"
 
             if (namaSekolah.includes("tk")) {
                 if (tipeSekolah.namaTipe.toLowerCase() == "tk a") {
@@ -196,7 +196,7 @@ export class AuthService {
 
         const ageYear = ageByYear.getFullYear() - 1970
 
-        if (ageYear >= minimumAge) {
+        if (ageYear > minimumAge) {
             isQualified = true
         } else if (ageYear == minimumAge) {
             if (birthDateMonth.getMonth() <= minimumDateMonth.getMonth()) {
