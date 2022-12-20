@@ -11,6 +11,8 @@ import * as bcrypt from 'bcrypt'
 import { SekolahRepository } from 'src/sekolah/sekolah.repository';
 import { Akun } from './model';
 import { TipeAkun } from './model/enum/tipe-akun.enum';
+import { WaliSiswa } from 'src/siswa/model';
+import { TipeSekolah } from 'src/sekolah/model';
 
 @Injectable()
 export class AuthService {
@@ -119,6 +121,10 @@ export class AuthService {
             throw new ForbiddenException('Rute ini tidak diizinkan untuk Anda!')
         }
 
+        const tipeSekolahRaw: unknown = akunValidation.idTipeSekolah
+        const tipeSekolah = tipeSekolahRaw as TipeSekolah
+        const idTipeSekolah = tipeSekolah.id
+
         var result = []
         const registrasionData = await this.registerRepository.findOneBy({
             id: registrasionID
@@ -161,7 +167,9 @@ export class AuthService {
         })
 
         if (siswa) {
-            const idOrangTua = siswa.idOrangTua
+            const waliSiswaRaw: unknown = siswa.idOrangTua
+            const waliSiswa = waliSiswaRaw as WaliSiswa
+            const idOrangTua = waliSiswa.id
             const orangTua = await this.siswaRepository.findOneBy({
                 idOrangTua
             })
@@ -175,6 +183,8 @@ export class AuthService {
 
         result.push(await this.akunRepository.delete({ noPendaftaran }))
         result.push(await this.registerRepository.delete({ id: registrasionData.id }))
+
+        await this.tipeSekolahRepository.returnSisaKuota(idTipeSekolah)
 
         return result
     }

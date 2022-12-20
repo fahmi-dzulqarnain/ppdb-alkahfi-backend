@@ -27,6 +27,14 @@ export class TipeSekolahRepository extends Repository<TipeSekolah> {
         return this.update({ id }, tipeSekolah)
     }
 
+    async returnSisaKuota(id: string) {
+        const tipeSekolah = await this.findTipeSekolahByID(id)
+
+        tipeSekolah.sisaKuota += 1
+
+        return this.update({ id }, tipeSekolah)
+    }
+
     async findTipeSekolahByID(id: string) {
         const tipeSekolah = await this.findOneBy({ id })
 
