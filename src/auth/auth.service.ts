@@ -129,7 +129,7 @@ export class AuthService {
         const registrasionData = await this.registerRepository.findOneBy({
             id: registrasionID
         })
-
+        console.log(registrasionID)
         if (!registrasionData) {
             throw new NotFoundException(
                 `Data registrasi dengan id ${registrasionID} tidak ditemukan`
