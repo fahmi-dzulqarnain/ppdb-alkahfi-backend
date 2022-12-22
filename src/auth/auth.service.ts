@@ -152,7 +152,7 @@ export class AuthService {
         if (waliSiswa) {
             const idOrangTua = waliSiswa.id
             const siswa = await this.siswaRepository.findOneBy({
-                idOrangTua
+                idOrangTua, idRegistrasi: registrasionID
             })
 
             if (siswa) {
@@ -160,26 +160,21 @@ export class AuthService {
             }
 
             result.push(await this.waliSiswaRepository.delete({ id: idOrangTua }))
+        } else {
+            const siswa = await this.siswaRepository.findOneBy({
+                nisn: akun.username, idRegistrasi: registrasionID
+            })
+    
+            if (siswa) {
+                const waliSiswaRaw: unknown = siswa.idOrangTua
+                const waliSiswa = waliSiswaRaw as WaliSiswa
+                const idOrangTua = waliSiswa.id
+                
+                result.push(await this.siswaRepository.delete({ idRegistrasi: registrasionID }))
+                result.push(await this.waliSiswaRepository.delete({ id: idOrangTua }))
+            }
         }
-
-        const siswa = await this.siswaRepository.findOneBy({
-            nisn: akun.username
-        })
-
-        if (siswa) {
-            const waliSiswaRaw: unknown = siswa.idOrangTua
-            const waliSiswa = waliSiswaRaw as WaliSiswa
-            const idOrangTua = waliSiswa.id
-            
-            console.log(idOrangTua)
-            console.log(waliSiswa)
-            result.push(await this.siswaRepository.delete({ id: siswa.id }))
-            console.log("Deleting Wali Siswa")
-            result.push(await this.waliSiswaRepository.delete({ id: idOrangTua }))
-            console.log("Success Delete Orang Tua")
-        }
-        console.log(registrasionData)
-        console.log(registrasionData.id)
+        
         result.push(await this.akunRepository.delete({ noPendaftaran }))
         result.push(await this.registerRepository.delete({ id: registrasionData.id }))
 
