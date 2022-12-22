@@ -170,16 +170,12 @@ export class AuthService {
             const waliSiswaRaw: unknown = siswa.idOrangTua
             const waliSiswa = waliSiswaRaw as WaliSiswa
             const idOrangTua = waliSiswa.id
-            const orangTua = await this.siswaRepository.findOneBy({
-                idOrangTua
-            })
+            
             console.log(idOrangTua)
             console.log(waliSiswa)
-            result.push(await this.siswaRepository.delete(siswa))
-
-            if (orangTua) {
-                result.push(await this.waliSiswaRepository.delete({ id: idOrangTua }))
-            }
+            result.push(await this.siswaRepository.delete({ id: siswa.id }))
+            console.log("Deleting Wali Siswa")
+            result.push(await this.waliSiswaRepository.delete({ id: idOrangTua }))
             console.log("Success Delete Orang Tua")
         }
         console.log(registrasionData)
