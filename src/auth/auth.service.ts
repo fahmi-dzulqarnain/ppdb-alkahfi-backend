@@ -135,16 +135,16 @@ export class AuthService {
                 `Data registrasi dengan id ${registrasionID} tidak ditemukan`
             )
         }
-
+        console.log(registrasionData)
         const noPendaftaran = registrasionData.noPendaftaran
         const akun = await this.akunRepository.findOneBy({ noPendaftaran })
-
+        console.log("After Account")
         if (!akun) {
             throw new NotFoundException(
                 `Data akun dengan no pendaftaran ${noPendaftaran} tidak ditemukan`
             )
         }
-
+        console.log("Getting Parent")
         const waliSiswa = await this.waliSiswaRepository.findOneBy({
             hpAyah: akun.username
         })
@@ -161,7 +161,7 @@ export class AuthService {
 
             result.push(await this.waliSiswaRepository.delete({ id: idOrangTua }))
         }
-
+        console.log("Getting Student")
         const siswa = await this.siswaRepository.findOneBy({
             nisn: akun.username
         })
@@ -180,7 +180,7 @@ export class AuthService {
                 result.push(await this.waliSiswaRepository.delete({ id: idOrangTua }))
             }
         }
-
+        console.log(registrasionData.id)
         result.push(await this.akunRepository.delete({ noPendaftaran }))
         result.push(await this.registerRepository.delete({ id: registrasionData.id }))
 
