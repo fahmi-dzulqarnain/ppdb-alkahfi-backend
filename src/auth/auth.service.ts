@@ -121,10 +121,6 @@ export class AuthService {
             throw new ForbiddenException('Rute ini tidak diizinkan untuk Anda!')
         }
 
-        const tipeSekolahRaw: unknown = akunValidation.idTipeSekolah
-        const tipeSekolah = tipeSekolahRaw as TipeSekolah
-        const idTipeSekolah = tipeSekolah.id
-
         var result = []
         const registrasionData = await this.registerRepository.findOneBy({
             id: registrasionID
@@ -138,6 +134,10 @@ export class AuthService {
 
         const noPendaftaran = registrasionData.noPendaftaran
         const akun = await this.akunRepository.findOneBy({ noPendaftaran })
+
+        const tipeSekolahRaw: unknown = akun.idTipeSekolah
+        const tipeSekolah = tipeSekolahRaw as TipeSekolah
+        const idTipeSekolah = tipeSekolah.id
 
         if (!akun) {
             throw new NotFoundException(
